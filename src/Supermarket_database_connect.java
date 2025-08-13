@@ -20,10 +20,10 @@ public class Supermarket_database_connect {
         e.printStackTrace();
     }
   }
-  public static void main(String[] args) {
+  /*public static void main(String[] args) {
        Supermarket_database_connect co = new Supermarket_database_connect();
        co.supermarketDatabase();
   }
-
+   */
 }
  
