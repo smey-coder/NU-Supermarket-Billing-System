@@ -200,7 +200,7 @@ public class Login_Form extends JFrame {
                 JOptionPane.showMessageDialog(this, "Login successful as " + role.toUpperCase(), "Success", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
                 if (role.equals("admin")) {
-                    new Main_menu().setVisible(true);
+                    new Main_admin().setVisible(true);
                 } else {
                     new Main_user().setVisible(true);
                 }

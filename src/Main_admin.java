@@ -6,11 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import com.formdev.flatlaf.FlatLightLaf;
 
-public class Main_menu extends JFrame {
+public class Main_admin extends JFrame {
 
-    public Main_menu() {
+    public Main_admin() {
         setTitle("Supermarket Billing System");
-        setIconImage(new ImageIcon(Main_menu.class.getResource("/Image/icons8-supermarket-64.png")).getImage());
+        setIconImage(new ImageIcon(Main_admin.class.getResource("/Image/icons8-supermarket-64.png")).getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
         setLocationRelativeTo(null);
@@ -107,7 +107,7 @@ public class Main_menu extends JFrame {
     private static JButton createSidebarButton(String text, String iconPath) {
         JButton btn = new JButton(text);
 
-        java.net.URL resource = Main_menu.class.getResource(iconPath);
+        java.net.URL resource = Main_admin.class.getResource(iconPath);
         if (resource != null) {
             ImageIcon icon = new ImageIcon(resource);
             btn.setIcon(icon);
@@ -161,7 +161,7 @@ public class Main_menu extends JFrame {
         }
 
         SwingUtilities.invokeLater(() -> {
-            Main_menu mainMenu = new Main_menu();
+            Main_admin mainMenu = new Main_admin();
             mainMenu.setVisible(true);
         });
     }

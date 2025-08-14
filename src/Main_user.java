@@ -10,7 +10,7 @@ public class Main_user extends JFrame {
 
     public Main_user() {
         setTitle("Supermarket Billing System");
-        setIconImage(new ImageIcon(Main_menu.class.getResource("/Image/icons8-supermarket-64.png")).getImage());
+        setIconImage(new ImageIcon(Main_admin.class.getResource("/Image/icons8-supermarket-64.png")).getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
         setLocationRelativeTo(null);
@@ -111,7 +111,7 @@ public class Main_user extends JFrame {
     private static JButton createSidebarButton(String text, String iconPath) {
         JButton btn = new JButton(text);
 
-        java.net.URL resource = Main_menu.class.getResource(iconPath);
+        java.net.URL resource = Main_admin.class.getResource(iconPath);
         if (resource != null) {
             ImageIcon icon = new ImageIcon(resource);
             btn.setIcon(icon);

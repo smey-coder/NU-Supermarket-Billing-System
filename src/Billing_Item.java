@@ -2,8 +2,6 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.MessageFormat;
-import com.formdev.flatlaf.FlatLightLaf;
 import java.sql.*;
 
 
