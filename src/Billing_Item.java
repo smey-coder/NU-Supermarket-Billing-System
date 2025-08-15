@@ -6,9 +6,6 @@ import java.sql.*;
 
 
 public class Billing_Item extends JPanel {
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
 
     private JComboBox<String> productBox = new JComboBox<>();
     private JComboBox<String> billBox = new JComboBox<>();
@@ -31,7 +28,7 @@ public class Billing_Item extends JPanel {
         inputPanel.setBorder(BorderFactory.createTitledBorder("Add Product to Bill"));
 
         // Load Bill IDs
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword);
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase();
              PreparedStatement ps = conn.prepareStatement("SELECT id FROM Bills");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -42,7 +39,7 @@ public class Billing_Item extends JPanel {
         }
 
         // Load Product Names
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword);
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase();
              PreparedStatement ps = conn.prepareStatement("SELECT name FROM Products");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -130,7 +127,7 @@ public class Billing_Item extends JPanel {
         productBox.addActionListener(e -> {
             String selectedProduct = (String) productBox.getSelectedItem();
             if (selectedProduct != null) {
-                try (Connection conn = DriverManager.getConnection(url, user, dbPassword);
+                try (Connection conn = new Supermarket_database_connect().supermarketDatabase();
                      PreparedStatement ps = conn.prepareStatement("SELECT price FROM Products WHERE name = ?")) {
                     ps.setString(1, selectedProduct);
                     ResultSet rs = ps.executeQuery();
@@ -167,7 +164,7 @@ public class Billing_Item extends JPanel {
             int qtyVal = Integer.parseInt(quantity);
             double totalVal = Double.parseDouble(total);
 
-            try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+            try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
                 int productId = getProductIdByName(conn, productName);
                 if (productId == -1) {
                     JOptionPane.showMessageDialog(this, "Product not found.");

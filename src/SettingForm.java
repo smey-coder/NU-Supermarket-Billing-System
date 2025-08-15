@@ -5,9 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 public class SettingForm extends JPanel{
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
 
     private JPasswordField currentPasswordField, passwordField, confirmField;
     private JTextField currentIdField;
@@ -151,7 +148,7 @@ public class SettingForm extends JPanel{
             return;
         }
 
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             // Step 1: Check current password
             String checkSQL = "SELECT * FROM Users Where id = ? And  password = ? And role = ?";
             PreparedStatement checkStmt = conn.prepareStatement(checkSQL);

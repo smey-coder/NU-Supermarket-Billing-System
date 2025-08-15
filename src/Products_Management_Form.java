@@ -9,10 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+
 public class Products_Management_Form extends JPanel {
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
+    
     private final Map<String, Integer> categoryMap = new HashMap<>();
     JTextField productNamTextField = new JTextField(15);
     JComboBox<String> categorField = new JComboBox<>();
@@ -63,9 +62,10 @@ public class Products_Management_Form extends JPanel {
         ));
         productPanel.setBackground(new Color(250, 250, 250));
         //Category database
-        try (Connection connection = DriverManager.getConnection(url, user, dbPassword);
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id,name FROM Category");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection connection = new Supermarket_database_connect().supermarketDatabase())
+          {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT id,name FROM Category");
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
@@ -184,14 +184,20 @@ public class Products_Management_Form extends JPanel {
                 JOptionPane.showMessageDialog(this, "Please fill all fields", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 // Add logic to create product in database
-                try{
-                    Connection connection = DriverManager.getConnection(url, user, dbPassword);
+                try(Connection connection = new Supermarket_database_connect().supermarketDatabase()){
+                    if (connection == null){
+                        JOptionPane.showMessageDialog(this, "Database connection failed", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    Double parsedPrice = Double.parseDouble(price);
+                    int parsedStock = Integer.parseInt(stock);
+
                     String sql = "INSERT INTO Products (name, category_id, price, stockQuantity, description, date_created) VALUES (?, ?, ?, ?, ?, ?)";
                     PreparedStatement preparedStatement = connection.prepareStatement(sql);
                     preparedStatement.setString(1, name);
                     preparedStatement.setInt(2, categoryMap.get(category)); // Use the map to get
-                    preparedStatement.setDouble(3, Integer.parseInt(price));
-                    preparedStatement.setInt(4, Integer.parseInt(stock));
+                    preparedStatement.setDouble(3, parsedPrice);
+                    preparedStatement.setInt(4, parsedStock);
                     preparedStatement.setString(5, description);
                     Timestamp dateTime = new Timestamp(System.currentTimeMillis());
                     preparedStatement.setTimestamp(6, dateTime);
@@ -203,8 +209,10 @@ public class Products_Management_Form extends JPanel {
                     clearFields(productNamTextField, categorField, pricTextField, stockQtyField, descriptionField);
                     connection.close();
 
-                }catch(Exception ex){
+                }catch(SQLException ex){
                     JOptionPane.showMessageDialog(this, "Error creating product: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }catch (NumberFormatException ex){
+                    JOptionPane.showMessageDialog(this, "Price and Stock must be valid numbers!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 
@@ -223,7 +231,11 @@ public class Products_Management_Form extends JPanel {
         String price = pricTextField.getText();
         String stock = stockQtyField.getText();
         String description = descriptionField.getText();
-        try(Connection connection = DriverManager.getConnection(url, user, dbPassword)){
+        try(Connection connection = new Supermarket_database_connect().supermarketDatabase()){
+            if(connection == null){
+                JOptionPane.showMessageDialog(this, "Database connection failed", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String sql = "Update Products set name = ?, category_id = ?, price = ?, stockQuantity = ?, description = ?, date_updated = ? Where id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, name);
@@ -245,8 +257,10 @@ public class Products_Management_Form extends JPanel {
                 clearFields(productNamTextField, categorField, pricTextField, stockQtyField, descriptionField);
               }
 
-        }catch (Exception ex){
+        }catch (SQLException ex){
             JOptionPane.showMessageDialog(this, "Error updating products: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }catch (NumberFormatException ex){
+             JOptionPane.showMessageDialog(this, "Price and Stock must be valid numbers!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     //Deleted products
@@ -265,10 +279,13 @@ public class Products_Management_Form extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this product?", "Confirm", JOptionPane.YES_NO_OPTION);
         if (confirm != JOptionPane.YES_OPTION) return;
 
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
-
+        try (Connection connection = new Supermarket_database_connect().supermarketDatabase()) {
+            if(connection == null){
+                JOptionPane.showMessageDialog(this, "Database connection failed", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             // Step 1: Check if product is used in Bill_Items
-            PreparedStatement check = conn.prepareStatement("SELECT COUNT(*) FROM Bill_Items WHERE product_id = ?");
+            PreparedStatement check = connection.prepareStatement("SELECT COUNT(*) FROM Bill_Items WHERE product_id = ?");
             check.setInt(1, productId);
             ResultSet rs = check.executeQuery();
             if (rs.next() && rs.getInt(1) > 0) {
@@ -280,13 +297,13 @@ public class Products_Management_Form extends JPanel {
                 }
 
                 // Step 2: Delete related Bill_Items
-                PreparedStatement pst1 = conn.prepareStatement("DELETE FROM Bill_Items WHERE product_id = ?");
+                PreparedStatement pst1 = connection.prepareStatement("DELETE FROM Bill_Items WHERE product_id = ?");
                 pst1.setInt(1, productId);
                 pst1.executeUpdate();
         }
 
         // Step 3: Delete the product
-        PreparedStatement pst2 = conn.prepareStatement("DELETE FROM Products WHERE id = ?");
+        PreparedStatement pst2 = connection.prepareStatement("DELETE FROM Products WHERE id = ?");
         pst2.setInt(1, productId);
         int rowsDeleted = pst2.executeUpdate();
 
@@ -306,10 +323,11 @@ public class Products_Management_Form extends JPanel {
         if (keyword == null || keyword.trim().isEmpty()) return;
 
         tableModel.setRowCount(0);
-        String sql = "SELECT id, name, category_id, price, stockQuantity, description, date_created, date_updated FROM Products WHERE name LIKE ? OR CAST(category_id AS VARCHAR) LIKE ?";
+        
 
-        try (Connection connection = DriverManager.getConnection(url, user, dbPassword);
-             PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (Connection connection = new Supermarket_database_connect().supermarketDatabase()) {
+            String sql = "SELECT id, name, category_id, price, stockQuantity, description, date_created, date_updated FROM Products WHERE name LIKE ? OR CAST(category_id AS VARCHAR) LIKE ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, "%" + keyword + "%");
             ps.setString(2, "%" + keyword + "%");
 
@@ -340,9 +358,9 @@ public class Products_Management_Form extends JPanel {
     // Method to read products from the database and populate the table model
     public void readProducts(DefaultTableModel tableModel) {
         
-        try (Connection connection = DriverManager.getConnection(url, user, dbPassword);
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id,name, category_id, price, stockQuantity, description, date_created , date_updated From Products");
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection connection  = new Supermarket_database_connect().supermarketDatabase()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT id,name, category_id, price, stockQuantity, description, date_created , date_updated From Products");
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");

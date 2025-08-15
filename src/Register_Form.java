@@ -8,9 +8,6 @@ public class Register_Form extends Supermarket_database_connect {
     private JTextField usernameField;
     private JPasswordField passwordField, confirmField;
 
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
 
     public void register() {
         try {
@@ -96,7 +93,7 @@ public class Register_Form extends Supermarket_database_connect {
             } else if (!password.equals(confirm)) {
                 JOptionPane.showMessageDialog(frame, "Passwords do not match!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+                try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
                     String checkSql = "Select * from Users Where username = ?";
                     PreparedStatement checkStatement = conn.prepareStatement(checkSql);
                     checkStatement.setString(1, username);

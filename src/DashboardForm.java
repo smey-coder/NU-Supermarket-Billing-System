@@ -9,9 +9,6 @@ import java.time.LocalDate;
 
 public class DashboardForm extends JPanel {
 
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String dbuser = "sa";
-    private final String password = "hello";
 
     private JLabel lblUsers, lblProducts, lblRevenue, lblTodayRevenue;
     private JTable salesTable;
@@ -92,7 +89,7 @@ public class DashboardForm extends JPanel {
     }
 
     private void refreshDashboard() {
-        try (Connection conn = DriverManager.getConnection(url, dbuser, password)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             Statement stmt = conn.createStatement();
 
             // Total Users

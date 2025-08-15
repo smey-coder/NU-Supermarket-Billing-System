@@ -20,9 +20,7 @@ import javax.swing.border.TitledBorder;
 import java.sql.*;
 import javax.swing.*;
 public class Category_manager_Form extends JPanel{
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
+    
     JTextField nameField = new JTextField(20);
     JTextField descriptionField = new JTextField(20);
 
@@ -109,7 +107,7 @@ public class Category_manager_Form extends JPanel{
             JOptionPane.showMessageDialog(this, "Please fill in all fields", "Warning", JOptionPane.WARNING_MESSAGE);
         }else{
             try{
-                Connection conn = DriverManager.getConnection(url, user, dbPassword);
+                Connection conn = new Supermarket_database_connect().supermarketDatabase();
                 String sql = "Insert into Category (name, description, date_created) Values (?, ?, ?)";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setString(1, name);
@@ -143,7 +141,7 @@ public class Category_manager_Form extends JPanel{
             JOptionPane.showMessageDialog(this, "Please fill in all fields", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        try(Connection connection = DriverManager.getConnection(url, user, dbPassword)){
+        try(Connection connection = new Supermarket_database_connect().supermarketDatabase()){
             String sql = "Update Category set name = ?, description = ?, date_updated = ? Where id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, name);
@@ -180,7 +178,7 @@ public class Category_manager_Form extends JPanel{
             return;
         }
         int selectedCategoryId = (int) tableModel.getValueAt(selectedRow, 0);
-        try(Connection connection = DriverManager.getConnection(url, user, dbPassword)){
+        try(Connection connection = new Supermarket_database_connect().supermarketDatabase()){
             String sql = "Delete From Category Where id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, selectedCategoryId);
@@ -214,7 +212,7 @@ public class Category_manager_Form extends JPanel{
     }
     //Read database
     public void readCategory(DefaultTableModel tableModel){
-        try (Connection connection = DriverManager.getConnection(url, user, dbPassword);
+        try (Connection connection = new Supermarket_database_connect().supermarketDatabase();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, name, description , date_created, date_updated From Category");
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {

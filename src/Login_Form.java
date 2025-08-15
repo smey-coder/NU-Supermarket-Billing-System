@@ -6,12 +6,8 @@ import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
 
 public class Login_Form extends JFrame {
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
-
+    
     private JComboBox<String> roleComboBox;
-
     public Login_Form() {
         setTitle("Login Admin or User");
         setSize(700, 450);
@@ -221,7 +217,7 @@ public class Login_Form extends JFrame {
     }
 
     private boolean isValidUser(String username, String password, String role) {
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             String sql = "SELECT * FROM Users WHERE username = ? AND password = ? AND role = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);

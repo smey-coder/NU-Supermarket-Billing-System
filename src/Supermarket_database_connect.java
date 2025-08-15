@@ -1,29 +1,22 @@
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 public class Supermarket_database_connect {
-    public void supermarketDatabase(){
-        final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-        final String user = "sa";
-        final String password = "hello";
+    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
+    private final String user = "sa";
+    private final String password = "hello";
 
-    try{
-        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-    } catch(ClassNotFoundException ex){
-        System.out.println("Sql Server Driver not found!: ");
-        ex.printStackTrace();
-        return;
-    }
-
-    try (Connection conn = DriverManager.getConnection(url, user, password)){
+    public Connection supermarketDatabase() throws SQLException {
+        try {
+            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        } catch (ClassNotFoundException ex) {
+            System.out.println("SQL Server Driver not found!");
+            ex.printStackTrace();
+            return null;
+        }
+        Connection conn = DriverManager.getConnection(url, user, password);
         System.out.println("Connected Successfully!");
-    } catch(SQLException e){
-        System.out.println("Connection failed!");
-        e.printStackTrace();
+        return conn;
     }
-  }
-  /*public static void main(String[] args) {
-       Supermarket_database_connect co = new Supermarket_database_connect();
-       co.supermarketDatabase();
-  }
-   */
 }
- 

@@ -6,9 +6,6 @@ import java.sql.*;
 import javax.swing.border.TitledBorder;
 
 public class CustomerForm extends JPanel {
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String user = "sa";
-    private final String dbPassword = "hello";
 
     private JTextField txtName, txtPhone, txtAddress;
     private JTable customerTable;
@@ -137,7 +134,7 @@ public class CustomerForm extends JPanel {
 
         int customerId = (int) tableModel.getValueAt(selectedRow, 0);
 
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
 
             // 1. Delete related bill items
             String sqlDeleteBillItems = "DELETE FROM Bill_Items WHERE bill_id IN (SELECT id FROM Bills WHERE customer_id = ?)";
@@ -186,7 +183,7 @@ public class CustomerForm extends JPanel {
             return;
         }
 
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             String sql = "UPDATE Customers SET name = ?, phone = ?, address = ? WHERE id = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, name);
@@ -213,7 +210,7 @@ public class CustomerForm extends JPanel {
             return;
         }
 
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             String sql = "INSERT INTO Customers (name, phone, address) VALUES (?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, name);
@@ -242,7 +239,7 @@ public class CustomerForm extends JPanel {
     private void loadCustomers() {
         tableModel.setRowCount(0); // clear existing rows
 
-        try (Connection conn = DriverManager.getConnection(url, user, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             String sql = "SELECT * FROM Customers";
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(sql);

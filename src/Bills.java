@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Bills extends JPanel {
-    private final String url = "jdbc:sqlserver://localhost:1433;databaseName=Supermarket Billing System_Assignment_Java;encrypt=true;trustServerCertificate=true;";
-    private final String dbuser = "sa";
-    private final String dbPassword = "hello";
     private final Map<String, Integer> CustomerMap = new HashMap<>();
     private final Map<String, Integer> UserMap = new HashMap<>();
 
@@ -92,7 +89,7 @@ public class Bills extends JPanel {
     }
 
     private void loadCustomers() {
-        try (Connection conn = DriverManager.getConnection(url, dbuser, dbPassword);
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase();
              PreparedStatement ps = conn.prepareStatement("SELECT id, name FROM Customers");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -107,7 +104,7 @@ public class Bills extends JPanel {
     }
 
     private void loadUsers() {
-        try (Connection conn = DriverManager.getConnection(url, dbuser, dbPassword);
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase();
              PreparedStatement ps = conn.prepareStatement("SELECT id, username FROM Users");
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -164,7 +161,7 @@ public class Bills extends JPanel {
                     "JOIN Users u ON b.user_id = u.id " +
                     "WHERE b.id LIKE ?";
 
-        try (Connection connection = DriverManager.getConnection(url, dbuser, dbPassword);
+        try (Connection connection = new Supermarket_database_connect().supermarketDatabase();
             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             String likeKeyword = "%" + keyword.trim() + "%";
@@ -217,7 +214,7 @@ public class Bills extends JPanel {
             return;
         }
 
-        try (Connection conn = DriverManager.getConnection(url, dbuser, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             String sql = "INSERT INTO Bills (id, customer_id, user_id, totalAmount, date) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, billId);
@@ -253,7 +250,7 @@ public class Bills extends JPanel {
 
     private void loadBillsFromDatabase() {
         tableModel.setRowCount(0);
-        try (Connection conn = DriverManager.getConnection(url, dbuser, dbPassword)) {
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase()) {
             String sql = """
                 SELECT b.id, c.name AS customer_name, u.username AS user_name, b.date, b.totalAmount
                 FROM Bills b
@@ -287,7 +284,7 @@ public class Bills extends JPanel {
             WHERE id = ?
         """;
 
-        try (Connection conn = DriverManager.getConnection(url, dbuser, dbPassword);
+        try (Connection conn = new Supermarket_database_connect().supermarketDatabase();
             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, billId);
